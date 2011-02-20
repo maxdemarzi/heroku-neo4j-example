@@ -1,0 +1,27 @@
+!!!
+%html
+  %head
+    %title IMDB powered by Neo4j
+    %link(rel="stylesheet" href="/css/styles.css")
+  %body
+    #page
+      #logo
+        #icon
+        #movieAppLabel
+          %h1 IMDB Powered by Neo4j
+
+      = yield
+
+    %hr
+      %table
+        %tr
+          %th Action
+          %th Time (ms)
+        - @times.each do | result|
+          %tr
+            %td= result[0]
+            %td= result[1]
+    
+    %script{:src => "http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"}
+    %script{:src => "http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.2/jquery-ui.min.js"}
+    %script{:src => "/js/script.js"} 

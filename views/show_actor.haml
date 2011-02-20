@@ -1,8 +1,4 @@
-%title IMDB powered by Neo4j
-%h1
-  IMDB powered by Neo4j - Actor
-  
-%h2= @actor["data"]["name"]
+%h1= "Actor: #{@actor["data"]["name"]}"
 
 Kevin Bacon number: 
 
@@ -34,13 +30,3 @@ Kevin Bacon number:
     %tr
       %td= link_to role["movie_link"], role["movie_title"]
       %td= role["data"]["role"]
-
-%hr
-  %table
-    %tr
-      %th Action
-      %th Time (ms)
-    - @times.each do | result|
-      %tr
-        %td= result[0]
-        %td= result[1]

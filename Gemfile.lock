@@ -32,6 +32,7 @@ PLATFORMS
 
 DEPENDENCIES
   haml (= 3.0.25)
+  json
   neography (= 0.0.10)
   net-http-spy
   rack-test

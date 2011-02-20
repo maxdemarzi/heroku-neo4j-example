@@ -34,14 +34,14 @@ include Neography
 
 
 configure do
-    env = ENV['NEO4J_ENV'] && "development"
+    env = ENV['NEO4J_ENV'] || "development"
     $stderr.puts env
     if env == "development"
       require 'net-http-spy'
       Net::HTTP.http_logger_options = {:verbose => true} 
     end
 
-  Config.server = ENV['NEO4J_HOST'] ||'ec2-184-73-42-24.compute-1.amazonaws.com'
+  Config.server = ENV['NEO4J_HOST'] || 'ec2-184-73-42-24.compute-1.amazonaws.com'
   Config.directory = '/' + (ENV['NEO4J_INSTANCE'] ||'imdb')
   Config.authentication = 'basic'
   Config.username = ENV['NEO4J_LOGIN'] ||'imdb'
@@ -113,9 +113,28 @@ post '/search' do
   haml :search_results
 end
 
+
+get '/autocomplete.json' do
+  content_type :json
+
+  @search =  params["term"].downcase
+  @escaped_search = URI.escape(@search)
+  @search_movies = @neo.get_node_index("search", "title.part", @escaped_search)
+  @search_actors = @neo.get_node_index("search", "name.part", @escaped_search)
+  @search_actors=expand_word_node(@search_actors,"PART_OF_NAME", "name")
+  @search_movies=expand_word_node(@search_movies,"PART_OF_TITLE", "title")
+
+  @search_results = Array.new
+  @search_actors.collect{ |actor| @search_results << {:category => "Actor", :value => "actor/#{node_id(actor)}", :label => actor["data"]["name"]} } unless @search_actors.nil? 
+  @search_movies.collect{ |movie| @search_results << {:category => "Movie", :value => "movie/#{node_id(movie)}", :label => movie["data"]["title"]} } unless @search_movies.nil? 
+
+  @search_results.to_json
+end
+
 def node_id(node)
   node["self"].split("/").last
 end
+
 def neighbours(type, direction)
   {"order" => "depth first",
                  "uniqueness" => "node global",
@@ -220,7 +239,6 @@ get '/movie_v2/:id' do
 
   haml :show_movie_v2
 end
-
 
   run! if app_file == $0
 end
